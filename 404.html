@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    // GitHub Pages 404 handler: redirect auth callbacks to the app
+    var hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+      window.location.replace('/todo-app/' + hash);
+    } else {
+      window.location.replace('/todo-app/');
+    }
+  </script>
+</head>
+<body>
+  <p>Yonlendiriliyor...</p>
+</body>
+</html>
