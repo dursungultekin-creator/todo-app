@@ -28,6 +28,116 @@
       font-size: 28px;
     }
 
+    /* Auth styles */
+    .auth-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .auth-box h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .auth-box input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .auth-box input:focus {
+      border-color: #4a90d9;
+    }
+
+    .auth-box .btn {
+      width: 100%;
+      padding: 12px;
+      background: #4a90d9;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 8px;
+    }
+
+    .auth-box .btn:hover {
+      background: #357abd;
+    }
+
+    .auth-box .btn-secondary {
+      background: none;
+      color: #4a90d9;
+      border: 1px solid #4a90d9;
+    }
+
+    .auth-box .btn-secondary:hover {
+      background: #f0f6ff;
+    }
+
+    .auth-message {
+      text-align: center;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .auth-message.error {
+      background: #fde8e8;
+      color: #c0392b;
+    }
+
+    .auth-message.success {
+      background: #e8f8e8;
+      color: #27ae60;
+    }
+
+    /* Top bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .user-email {
+      font-size: 13px;
+      color: #888;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 280px;
+    }
+
+    .logout-btn {
+      padding: 6px 14px;
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      color: #666;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .logout-btn:hover {
+      border-color: #e74c3c;
+      color: #e74c3c;
+    }
+
+    /* Todo styles */
     .input-row {
       display: flex;
       gap: 8px;
@@ -99,7 +209,6 @@
       border-radius: 8px;
       margin-bottom: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      transition: opacity 0.2s;
     }
 
     .todo-item.done .todo-text {
@@ -130,9 +239,7 @@
       transition: color 0.2s;
     }
 
-    .edit-btn:hover {
-      color: #4a90d9;
-    }
+    .edit-btn:hover { color: #4a90d9; }
 
     .delete-btn {
       background: none;
@@ -144,9 +251,7 @@
       transition: color 0.2s;
     }
 
-    .delete-btn:hover {
-      color: #e74c3c;
-    }
+    .delete-btn:hover { color: #e74c3c; }
 
     .edit-input {
       flex: 1;
@@ -163,42 +268,207 @@
       padding: 32px 0;
       font-size: 15px;
     }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Todo App</h1>
 
-    <div class="input-row">
-      <input type="text" id="todoInput" placeholder="Yeni gorev ekle...">
-      <button onclick="addTodo()">Ekle</button>
+    <!-- Auth Section -->
+    <div id="authSection" class="auth-box">
+      <h2 id="authTitle">Giris Yap</h2>
+      <div id="authMessage" class="auth-message hidden"></div>
+      <input type="email" id="emailInput" placeholder="E-posta adresi">
+      <input type="password" id="passwordInput" placeholder="Sifre (min 6 karakter)">
+      <button class="btn" id="authBtn" onclick="handleAuth()">Giris Yap</button>
+      <button class="btn btn-secondary" id="toggleBtn" onclick="toggleAuthMode()">Hesabin yok mu? Kayit Ol</button>
     </div>
 
-    <div class="filters">
-      <button class="active" onclick="setFilter('all', this)">Tumu</button>
-      <button onclick="setFilter('active', this)">Aktif</button>
-      <button onclick="setFilter('done', this)">Tamamlanan</button>
-    </div>
+    <!-- App Section -->
+    <div id="appSection" class="hidden">
+      <div class="top-bar">
+        <span class="user-email" id="userEmail"></span>
+        <button class="logout-btn" onclick="logout()">Cikis Yap</button>
+      </div>
 
-    <ul class="todo-list" id="todoList"></ul>
+      <div class="input-row">
+        <input type="text" id="todoInput" placeholder="Yeni gorev ekle...">
+        <button onclick="addTodo()">Ekle</button>
+      </div>
+
+      <div class="filters">
+        <button class="active" onclick="setFilter('all', this)">Tumu</button>
+        <button onclick="setFilter('active', this)">Aktif</button>
+        <button onclick="setFilter('done', this)">Tamamlanan</button>
+      </div>
+
+      <ul class="todo-list" id="todoList"></ul>
+    </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://nbqfrmmgnsnkczuxgauy.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5icWZybW1nbnNua2N6dXhnYXV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODUyNjIsImV4cCI6MjA4OTg2MTI2Mn0.KrkcFXyDhtjQqm5dbE0JyZaJbwFWsaNNgf4d6-T1aQg';
+    const AUTH_URL = `${SUPABASE_URL}/auth/v1`;
     const API = `${SUPABASE_URL}/rest/v1/todos`;
-    const headers = {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    };
 
+    let session = JSON.parse(localStorage.getItem('supabase_session') || 'null');
     let todos = [];
     let filter = 'all';
+    let isSignUp = false;
+
+    function getHeaders() {
+      return {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      };
+    }
+
+    // --- Auth ---
+
+    function showMessage(text, type) {
+      const el = document.getElementById('authMessage');
+      el.textContent = text;
+      el.className = `auth-message ${type}`;
+    }
+
+    function toggleAuthMode() {
+      isSignUp = !isSignUp;
+      document.getElementById('authTitle').textContent = isSignUp ? 'Kayit Ol' : 'Giris Yap';
+      document.getElementById('authBtn').textContent = isSignUp ? 'Kayit Ol' : 'Giris Yap';
+      document.getElementById('toggleBtn').textContent = isSignUp
+        ? 'Zaten hesabin var mi? Giris Yap'
+        : 'Hesabin yok mu? Kayit Ol';
+      document.getElementById('authMessage').className = 'auth-message hidden';
+    }
+
+    async function handleAuth() {
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+
+      if (!email || !password) {
+        return showMessage('E-posta ve sifre gerekli.', 'error');
+      }
+      if (password.length < 6) {
+        return showMessage('Sifre en az 6 karakter olmali.', 'error');
+      }
+
+      if (isSignUp) {
+        await signUp(email, password);
+      } else {
+        await signIn(email, password);
+      }
+    }
+
+    async function signUp(email, password) {
+      const res = await fetch(`${AUTH_URL}/signup`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.identities && data.identities.length === 0) {
+          showMessage('Bu e-posta zaten kayitli.', 'error');
+        } else {
+          showMessage('Kayit basarili! Lutfen e-postanizi kontrol edin ve onay linkine tiklayin.', 'success');
+        }
+      } else {
+        showMessage(data.error_description || data.msg || 'Kayit sirasinda hata olustu.', 'error');
+      }
+    }
+
+    async function signIn(email, password) {
+      const res = await fetch(`${AUTH_URL}/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        session = data;
+        localStorage.setItem('supabase_session', JSON.stringify(session));
+        showApp();
+      } else {
+        if (data.error_description && data.error_description.includes('not confirmed')) {
+          showMessage('E-postaniz henuz onaylanmadi. Lutfen gelen kutunuzu kontrol edin.', 'error');
+        } else {
+          showMessage(data.error_description || 'Giris basarisiz. E-posta veya sifre yanlis.', 'error');
+        }
+      }
+    }
+
+    async function refreshToken() {
+      if (!session || !session.refresh_token) return false;
+      const res = await fetch(`${AUTH_URL}/token?grant_type=refresh_token`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: session.refresh_token })
+      });
+      if (res.ok) {
+        session = await res.json();
+        localStorage.setItem('supabase_session', JSON.stringify(session));
+        return true;
+      }
+      return false;
+    }
+
+    function logout() {
+      session = null;
+      localStorage.removeItem('supabase_session');
+      todos = [];
+      document.getElementById('authSection').classList.remove('hidden');
+      document.getElementById('appSection').classList.add('hidden');
+      document.getElementById('authMessage').className = 'auth-message hidden';
+      document.getElementById('emailInput').value = '';
+      document.getElementById('passwordInput').value = '';
+    }
+
+    function showApp() {
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('appSection').classList.remove('hidden');
+      document.getElementById('userEmail').textContent = session.user.email;
+      fetchTodos();
+    }
+
+    // --- Handle email confirmation redirect ---
+    function handleAuthRedirect() {
+      const hash = window.location.hash;
+      if (hash && hash.includes('access_token')) {
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        if (accessToken) {
+          // Decode JWT to get user info
+          const payload = JSON.parse(atob(accessToken.split('.')[1]));
+          session = {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            user: { email: payload.email, id: payload.sub }
+          };
+          localStorage.setItem('supabase_session', JSON.stringify(session));
+          window.location.hash = '';
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // --- Todos ---
 
     async function fetchTodos() {
-      const res = await fetch(`${API}?order=created_at.asc`, { headers });
+      const res = await fetch(`${API}?order=created_at.asc`, { headers: getHeaders() });
+      if (res.status === 401) {
+        const refreshed = await refreshToken();
+        if (refreshed) return fetchTodos();
+        return logout();
+      }
       todos = await res.json();
       render();
     }
@@ -235,8 +505,8 @@
       if (!text) return;
       input.value = '';
       await fetch(API, {
-        method: 'POST', headers,
-        body: JSON.stringify({ text, done: false })
+        method: 'POST', headers: getHeaders(),
+        body: JSON.stringify({ text, done: false, user_id: session.user.id })
       });
       await fetchTodos();
     }
@@ -245,7 +515,7 @@
       const todo = todos.find(t => t.id === id);
       if (!todo) return;
       await fetch(`${API}?id=eq.${id}`, {
-        method: 'PATCH', headers,
+        method: 'PATCH', headers: getHeaders(),
         body: JSON.stringify({ done: !todo.done })
       });
       await fetchTodos();
@@ -275,19 +545,15 @@
     }
 
     function handleEditKey(e, id) {
-      if (e.key === 'Enter') {
-        e.target.blur();
-      } else if (e.key === 'Escape') {
-        editingId = -1;
-        render();
-      }
+      if (e.key === 'Enter') e.target.blur();
+      else if (e.key === 'Escape') { editingId = -1; render(); }
     }
 
     async function finishEdit(id, input) {
       const newText = input.value.trim();
       if (newText && editingId === id) {
         await fetch(`${API}?id=eq.${id}`, {
-          method: 'PATCH', headers,
+          method: 'PATCH', headers: getHeaders(),
           body: JSON.stringify({ text: newText })
         });
       }
@@ -296,9 +562,7 @@
     }
 
     async function remove(id) {
-      await fetch(`${API}?id=eq.${id}`, {
-        method: 'DELETE', headers
-      });
+      await fetch(`${API}?id=eq.${id}`, { method: 'DELETE', headers: getHeaders() });
       await fetchTodos();
     }
 
@@ -313,7 +577,15 @@
       if (e.key === 'Enter') addTodo();
     });
 
-    fetchTodos();
+    document.getElementById('passwordInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleAuth();
+    });
+
+    // Init
+    handleAuthRedirect();
+    if (session && session.access_token) {
+      showApp();
+    }
   </script>
 </body>
 </html>
